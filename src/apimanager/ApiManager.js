@@ -12,7 +12,7 @@ export const NETWORK_METHOD = {
 
 const API = axios.create({
   baseURL: ENDPOINTS.baseUrl,
-  timeout: 2000,
+  timeout: 10000,
   headers: {},
 });
 

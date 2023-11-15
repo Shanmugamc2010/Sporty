@@ -26,4 +26,20 @@ export const SCREEN_TYPE = {
     name: 'Add_Events',
     title: 'Dashboard',
   },
+  TAB_NAVIGATOR: {
+    name: 'Tab_Navigator',
+    title: '',
+  },
+  MY_EVENTS: {
+    name: 'My Events',
+    title: 'My Events',
+  },
+  ALL_EVENTS: {
+    name: 'All Events',
+    title: 'All Events',
+  },
+  ACCOUNT: {
+    name: 'My Account',
+    title: 'My Account',
+  },
 };

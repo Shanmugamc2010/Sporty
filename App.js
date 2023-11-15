@@ -11,6 +11,9 @@ import {SafeAreaView} from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import {RootStack} from './src/navigation/RootStack';
 import Color from './src/utils/themes/colors';
+import {Provider} from 'react-redux';
+import {Persistor, Store} from './src/Redux/Store';
+import {PersistGate} from 'redux-persist/integration/react';
 
 function App() {
   useEffect(() => {
@@ -19,7 +22,11 @@ function App() {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: Color.White}}>
-      <RootStack />
+      <Provider store={Store}>
+        <PersistGate loading={null} persistor={Persistor}>
+          <RootStack />
+        </PersistGate>
+      </Provider>
     </SafeAreaView>
   );
 }

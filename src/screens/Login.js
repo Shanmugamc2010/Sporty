@@ -3,16 +3,14 @@ import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Color from '../utils/themes/colors';
 import {SportyInputText} from '../components/SprtyInput';
 import SportyButton from '../components/SportyButton';
-import {useNavigation} from '@react-navigation/native';
 import {SCREEN_TYPE} from '../utils/themes/constant';
-import {CommonActions} from '@react-navigation/native';
-import {ApiNetwork} from '../apimanager/ApiNetwork';
-import {apiCall} from '../apimanager/ApiManager';
+import {makeLoginCall} from '../Redux/Action';
+import {useDispatch} from 'react-redux';
 
-const Login = () => {
-  const navigator = useNavigation();
+const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
 
   const onEmailChangedText = text => {
     setEmail(text);
@@ -20,27 +18,17 @@ const Login = () => {
   const onPasswordChangedText = text => {
     setPassword(text);
   };
-  const onClickLoginPress = async () => {
+  const onClickLoginPress = () => {
     console.log(email);
     console.log(password);
-    const response = await apiCall(
-      ApiNetwork.makeLoginApiCall({username: email, password: password}),
-    );
-    if (response?.token) {
-      navigator.dispatch(
-        CommonActions.reset({
-          index: 1,
-          routes: [{name: SCREEN_TYPE.DASHBOARD.name}],
-        }),
-      );
-    }
+    dispatch(makeLoginCall(email, password, navigation));
   };
 
   const onClickSignUpPress = () => {
-    navigator.navigate(SCREEN_TYPE.REGISTER.name);
+    navigation.navigate(SCREEN_TYPE.REGISTER.name);
   };
   const onClickForgotPassword = () => {
-    navigator.navigate(SCREEN_TYPE.FORGOT_PASSWORD.name);
+    navigation.navigate(SCREEN_TYPE.FORGOT_PASSWORD.name);
   };
   return (
     <View style={styles.container}>
