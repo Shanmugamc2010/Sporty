@@ -1,16 +1,37 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Color from '../utils/themes/colors';
 import {SportyInputText} from '../components/SprtyInput';
 import SportyButton from '../components/SportyButton';
 import {SCREEN_TYPE} from '../utils/themes/constant';
-import {makeLoginCall} from '../Redux/Action';
-import {useDispatch} from 'react-redux';
+import {
+  makeLoginCall,
+  setInitialAppOpen,
+  setStateDistrictData,
+} from '../Redux/Action';
+import {useDispatch, useSelector} from 'react-redux';
+import {isInitialAppOpen} from '../Redux/Selector';
+import {ApiNetwork} from '../apimanager/ApiNetwork';
+import {apiCall} from '../apimanager/ApiManager';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+  const isFirstTimeAppOpen = useSelector(state => isInitialAppOpen(state));
+
+  const fetchStateDictrictData = async () => {
+    if (isFirstTimeAppOpen) {
+      const response = await apiCall(ApiNetwork.makeStateApiCall());
+      dispatch(setInitialAppOpen());
+      dispatch(setStateDistrictData(response?.data));
+    }
+  };
+
+  useEffect(() => {
+    fetchStateDictrictData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onEmailChangedText = text => {
     setEmail(text);

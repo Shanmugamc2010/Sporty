@@ -1,6 +1,11 @@
 import {CommonActions} from '@react-navigation/native';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
-import {REQUEST_API_DATA, LOGIN_API_SUCCESS} from './Type';
+import {
+  REQUEST_API_DATA,
+  LOGIN_API_SUCCESS,
+  SET_INITIAL_APP_OPEN,
+  SET_STATE_DISTRICT_DATA,
+} from './Type';
 import {SCREEN_TYPE} from '../utils/themes/constant';
 import {apiCall} from '../apimanager/ApiManager';
 
@@ -16,6 +21,19 @@ export const loginApiSuccess = data => ({
 export const requestApiFailure = () => ({
   type: REQUEST_API_DATA,
 });
+
+export const setInitialAppOpen = () => {
+  return {
+    type: SET_INITIAL_APP_OPEN,
+  };
+};
+
+export const setStateDistrictData = data => {
+  return {
+    type: SET_STATE_DISTRICT_DATA,
+    payload: data,
+  };
+};
 
 export const makeLoginCall =
   (email, password, navigation) => async dispatch => {

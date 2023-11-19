@@ -24,7 +24,12 @@ API.interceptors.response.use(
 );
 
 export const apiCall = async params => {
-  const response = await API.post(params.url, params.data);
+  console.log(params);
+  const response = await API[params.method.toLowerCase()](
+    params.url,
+    params.data,
+  );
+  console.log(response);
   return response;
   // const response = await axiosInstance.post(api);
   // console.log(response);
@@ -32,19 +37,19 @@ export const apiCall = async params => {
 const requestHandler = request => {
   request.baseURL = ENDPOINTS.baseUrl;
   if (__DEV__) {
-    console.log('Request Data:', request.data);
-    console.log('Request Headers:', request.headers);
-    console.log('Request Config:', request);
+    // console.log('Request Data:', request.data);
+    // console.log('Request Headers:', request.headers);
+    // console.log('Request Config:', request);
   }
   //Append cancelToken to all Request header
   return request;
 };
 export const successHandler = response => {
-  console.log('response: ', response);
+  // console.log('response: ', response);
   return response.data;
 };
 export const errorHandler = error => {
   Alert.alert('', 'Something went wrong. Please try again later');
-  console.log('error:', error);
+  // console.log('error:', error);
 };
 export default API;

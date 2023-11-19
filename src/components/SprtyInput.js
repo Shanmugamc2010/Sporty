@@ -12,6 +12,7 @@ export const SportyInputText = props => {
         cursorColor={Color.MoodyBlue}
         placeholderTextColor={Color.MoodyBlue}
         value={props.value}
+        color={Color.PinkishPurple}
         onChangeText={props.onChangeText}
         {...props}
       />
@@ -25,7 +26,8 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 10,
     borderWidth: 0.5,
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
     minWidth: '80%',
     borderRadius: 10,
     borderColor: Color.MoodyBlue,

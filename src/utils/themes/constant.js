@@ -43,3 +43,12 @@ export const SCREEN_TYPE = {
     title: 'My Account',
   },
 };
+
+export const EVENT_TYPES = {
+  EVENT_START: 'eventStart',
+  EVENT_END: 'eventEnd',
+  REGISTRATION_END: 'registrationEnd',
+  GENDER: 'gender',
+  STATE: 'state',
+  DISTRICT: 'district',
+};

@@ -1,8 +1,17 @@
-import {REQUEST_API_DATA, LOGIN_API_SUCCESS, REQUEST_API_FAILURE} from './Type';
+import {isValidArray} from '../utils/helper';
+import {
+  REQUEST_API_DATA,
+  LOGIN_API_SUCCESS,
+  REQUEST_API_FAILURE,
+  SET_INITIAL_APP_OPEN,
+  SET_STATE_DISTRICT_DATA,
+} from './Type';
 
 const initialState = {
   isLoading: false,
   loginData: null,
+  isFirstTimeAppOpen: true,
+  stateData: null,
 };
 
 export const mainReducer = (state = initialState, action) => {
@@ -22,6 +31,17 @@ export const mainReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
       };
+    case SET_INITIAL_APP_OPEN:
+      return {
+        ...state,
+        isFirstTimeAppOpen: false,
+      };
+    case SET_STATE_DISTRICT_DATA:
+      return {
+        ...state,
+        stateData: action.payload,
+      };
+
     default:
       return state;
   }

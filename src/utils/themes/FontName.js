@@ -7,4 +7,5 @@ export const FONT_NAME = {
   EVENT: 'event',
   PERSON_FILL: 'person',
   PERSON_UNFILL: 'person-outline',
+  CANCEL: 'cancel',
 };

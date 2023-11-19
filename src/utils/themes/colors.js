@@ -8,6 +8,7 @@ const Color = {
   Blur: 'rgba(0, 0, 0, 0.5)',
   borderColor: '#778491',
   grey: '#f7f7f7',
+  OverLay: 'rgba(0,0,0,0.7)',
 };
 
 export default Color;

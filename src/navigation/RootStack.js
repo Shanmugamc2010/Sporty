@@ -9,6 +9,9 @@ import {SCREEN_TYPE} from '../utils/themes/constant';
 import TabNavigation from './TabNavigation';
 import {useSelector} from 'react-redux';
 import {getLoginData} from '../Redux/Selector';
+import Dashboard from '../screens/Dashboard';
+import AddEvent from '../screens/AddEvent';
+import DashboardFilter from '../screens/DashboardFilter';
 
 const Stack = createNativeStackNavigator();
 const hideHeader = {headerShown: false};
@@ -45,6 +48,27 @@ const MyStack = () => {
         component={TabNavigation}
         options={{...hideHeader}}
       />
+      <Stack.Screen
+        name={SCREEN_TYPE.DASHBOARD.name}
+        component={Dashboard}
+        options={{headerTitle: SCREEN_TYPE.DASHBOARD.title}}
+      />
+      <Stack.Screen
+        name={SCREEN_TYPE.ADD_EVENTS.name}
+        component={AddEvent}
+        options={{headerTitle: SCREEN_TYPE.ADD_EVENTS.title}}
+      />
+      {/* <Stack.Screen name={'DRAWER'} component={MyDrawer} options={''} /> */}
+      <Stack.Group
+        screenOptions={{
+          headerShown: false,
+          presentation: 'transparentModal',
+        }}>
+        <Stack.Screen
+          name={SCREEN_TYPE.DASHBOARD_FILTER.name}
+          component={DashboardFilter}
+        />
+      </Stack.Group>
     </Stack.Navigator>
   );
 };

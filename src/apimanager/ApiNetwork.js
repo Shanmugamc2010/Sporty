@@ -13,4 +13,14 @@ export const ApiNetwork = {
       // password: params?.password,
     },
   }),
+  makeStateApiCall: params => ({
+    method: NETWORK_METHOD.GET,
+    url: ENDPOINTS.State,
+    data: {},
+  }),
+  makeDistrictApiCall: params => ({
+    method: NETWORK_METHOD.GET,
+    url: `${ENDPOINTS.District}?state=${params.state}`,
+    data: {},
+  }),
 };
