@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Button, View, Text, Alert} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {Button, View, Text, Alert, Modal, PanResponder} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import FileUploadModal from '../components/FileUploadModal';
@@ -7,40 +7,37 @@ import SportyModal from '../components/SportyModal';
 
 const AllEvents = () => {
   const [modalVisible, setModalVisible] = useState(true);
-  const handleCameraPress = () => {
-    launchCamera({}, response => {
-      if (response.error) {
-        Alert.alert('Error', 'Failed to open camera');
-      } else {
-        console.log('Camera Response:', response);
-      }
-      setModalVisible(false);
-    });
+  const onClose = () => {
+    setModalVisible(false);
   };
-
-  const handleFilePress = () => {
-    launchImageLibrary({}, response => {
-      if (response.error) {
-        Alert.alert('Error', 'Failed to open file picker');
-      } else {
-        console.log('File Picker Response:', response);
-      }
-      setModalVisible(false);
-    });
-  };
-  const handleUploadPress = () => {
-    setModalVisible(true);
-  };
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderRelease: (e, gestureState) => {
+        console.log(gestureState.dy);
+        if (gestureState.dy > 50) {
+          console.log(gestureState.dy);
+          // onClose();
+        }
+      },
+    }),
+  ).current;
 
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
-      <SportyModal
+      <Modal
+        animationType="slide"
         visible={modalVisible}
-        onClose={() => {
-          setModalVisible(false);
-        }}
-        onPress={() => {}}
-      />
+        presentationStyle="formSheet"
+        onRequestClose={onClose}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'blue',
+          }}
+        />
+      </Modal>
     </View>
   );
 };

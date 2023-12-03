@@ -12,6 +12,7 @@ import {getLoginData} from '../Redux/Selector';
 import Dashboard from '../screens/Dashboard';
 import AddEvent from '../screens/AddEvent';
 import DashboardFilter from '../screens/DashboardFilter';
+import EventDetail from '../screens/EventDetail';
 
 const Stack = createNativeStackNavigator();
 const hideHeader = {headerShown: false};
@@ -58,7 +59,11 @@ const MyStack = () => {
         component={AddEvent}
         options={{headerTitle: SCREEN_TYPE.ADD_EVENTS.title}}
       />
-      {/* <Stack.Screen name={'DRAWER'} component={MyDrawer} options={''} /> */}
+      <Stack.Screen
+        name={SCREEN_TYPE.EVENT_DETAIL.name}
+        component={EventDetail}
+        options={{headerTitle: SCREEN_TYPE.title}}
+      />
       <Stack.Group
         screenOptions={{
           headerShown: false,

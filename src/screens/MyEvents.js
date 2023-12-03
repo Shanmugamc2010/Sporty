@@ -51,7 +51,12 @@ const MyEvents = props => {
     },
   ];
 
-  const onClickItem = () => {};
+  const onClickItem = () => {
+    props.navigation.navigate(SCREEN_TYPE.EVENT_DETAIL.name, {
+      title: 'Manoj Trophy',
+      conductedBy: 'Manoj',
+    });
+  };
   const onClickFilterOption = () => {
     props.navigation.navigate(SCREEN_TYPE.DASHBOARD_FILTER.name);
   };

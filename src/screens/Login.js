@@ -21,8 +21,11 @@ const Login = ({navigation}) => {
   const isFirstTimeAppOpen = useSelector(state => isInitialAppOpen(state));
 
   const fetchStateDictrictData = async () => {
+    console.log('1==>');
     if (isFirstTimeAppOpen) {
+      console.log('2==>');
       const response = await apiCall(ApiNetwork.makeStateApiCall());
+      console.log('3==>', response);
       dispatch(setInitialAppOpen());
       dispatch(setStateDistrictData(response?.data));
     }

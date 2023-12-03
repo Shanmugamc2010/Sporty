@@ -42,6 +42,10 @@ export const SCREEN_TYPE = {
     name: 'My Account',
     title: 'My Account',
   },
+  EVENT_DETAIL: {
+    name: 'Events',
+    title: 'Events',
+  },
 };
 
 export const EVENT_TYPES = {

@@ -30,8 +30,33 @@ import {getStateData} from '../Redux/Selector';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
 
-const AddEvent = () => {
+const AddEvent = props => {
+  const {
+    titleProps,
+    conductedProps,
+    venueProps,
+    gameTypeProps,
+    registerProps,
+    emailProps,
+    contact1Props,
+    contact2Props,
+    prizeMoneyProps,
+    prizeDetailsProps,
+    rulesProps,
+  } = props.route.params.eventDetails || {};
   const stateDataSelector = useSelector(state => getStateData(state));
+  const [title, setTitle] = useState(titleProps || '');
+  const [conductedBy, setConductedBy] = useState(conductedProps || '');
+  const [venue, setVenue] = useState(venueProps || '');
+  const [gameType, setGameType] = useState(gameTypeProps || '');
+  const [registerLink, setRegisterLink] = useState(registerProps || '');
+  const [email, setEmail] = useState(emailProps || '');
+  const [contact1, setContact1] = useState(contact1Props || '');
+  const [contact2, setContact2] = useState(contact2Props || '');
+  const [prizeMoney, setPrizeMoney] = useState(prizeMoneyProps || '');
+  const [prizeDetails, setPrizeDetails] = useState(prizeDetailsProps || '');
+  const [rules, setRules] = useState(rulesProps || '');
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [eventStart, setEventStart] = useState({date: '', displayDate: ''});
   const [eventEnd, setEventEnd] = useState({date: '', displayDate: ''});
@@ -73,6 +98,10 @@ const AddEvent = () => {
   };
 
   const openSportyModal = fieldName => {
+    if (fieldName === EVENT_TYPES.DISTRICT && !isValidString(districtData)) {
+      return Alert.alert('Select State');
+    }
+
     setActiveField(fieldName);
     setSportyModalVisible(true);
   };
@@ -198,18 +227,25 @@ const AddEvent = () => {
       <SportyInputText
         placeholder="Tournament Title"
         leftIcon={require('../assets/images/user.png')}
+        value={title}
+        onChangeText={text => setTitle(text)}
       />
       <SportyInputText
         placeholder="Conducted By"
         leftIcon={require('../assets/images/user.png')}
+        value={conductedBy}
+        onChangeText={text => setConductedBy(text)}
       />
       <SportyInputText
         placeholder="Venue"
         leftIcon={require('../assets/images/location.png')}
+        value={venue}
+        onChangeText={text => setVenue(text)}
       />
       <SportyInputText
         placeholder="Game Type"
         leftIcon={require('../assets/images/mail.png')}
+        value={gameType}
       />
       <TouchableOpacity onPress={() => openSportyModal(EVENT_TYPES.GENDER)}>
         <SportyInputText
@@ -270,14 +306,14 @@ const AddEvent = () => {
       <SportyInputText
         placeholder="Registration Link"
         leftIcon={require('../assets/images/location.png')}
+        value={registerLink}
+        onChangeText={text => setRegisterLink(text)}
       />
       <SportyInputText
         placeholder="Contact Email"
         leftIcon={require('../assets/images/mail.png')}
-      />
-      <SportyInputText
-        placeholder="Contact Email"
-        leftIcon={require('../assets/images/mail.png')}
+        value={email}
+        onChangeText={text => setEmail(text)}
       />
       <SportyInputText
         placeholder="Contact Number 1"
@@ -285,6 +321,8 @@ const AddEvent = () => {
         keyboardType={
           Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'number'
         }
+        value={contact1}
+        onChangeText={text => setContact1(text)}
       />
       <SportyInputText
         placeholder="Contact Number 2"
@@ -292,18 +330,26 @@ const AddEvent = () => {
         keyboardType={
           Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'number'
         }
+        value={contact2}
+        onChangeText={text => setContact2(text)}
       />
       <SportyInputText
         placeholder="Price Money"
         leftIcon={require('../assets/images/mail.png')}
+        value={prizeMoney}
+        onChangeText={text => setPrizeMoney(text)}
       />
       <SportyInputText
         placeholder="Price Details"
         leftIcon={require('../assets/images/mail.png')}
+        value={prizeDetails}
+        onChangeText={text => setPrizeDetails(text)}
       />
       <SportyInputText
         placeholder="Game Rules"
         leftIcon={require('../assets/images/mail.png')}
+        value={rules}
+        onChangeText={text => setRules(text)}
       />
       <View style={styles.docUploadContainer}>
         <Text style={styles.docUploadHeaderStyle}>Upload Document</Text>
