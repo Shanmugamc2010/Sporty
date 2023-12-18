@@ -23,4 +23,25 @@ export const ApiNetwork = {
     url: `${ENDPOINTS.District}?state=${params.state}`,
     data: {},
   }),
+  makeAddTournamentApiCall: params => ({
+    method: NETWORK_METHOD.POST,
+    url: ENDPOINTS.AddTournament,
+    data: {...params},
+  }),
+  makeUpdateTournamentApiCall: params => ({
+    method: NETWORK_METHOD.POST,
+    url: `${ENDPOINTS.UpdateTournament}?id=${params.tournamentId}`,
+    data: {...params},
+  }),
+  getTournamentsApiCall: params => ({
+    method: NETWORK_METHOD.GET,
+    url: `${ENDPOINTS.GetTournaments}?pageNo=1&rowsPerPage=1000&Status=1`,
+    // data: params,
+  }),
+
+  getTournamentApiCall: params => ({
+    method: NETWORK_METHOD.GET,
+    url: `${ENDPOINTS.GetTournament}?id=${params.tournamentId}`,
+    // data: params,
+  }),
 };

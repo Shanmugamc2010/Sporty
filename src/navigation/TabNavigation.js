@@ -8,7 +8,9 @@ import Account from '../screens/Account';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {FONT_NAME} from '../utils/themes/FontName';
 import {StyleSheet} from 'react-native';
-const Tab = createBottomTabNavigator();
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+
+const BottomTab = createBottomTabNavigator();
 
 const TabScreenOptions = props => {
   return {
@@ -19,6 +21,18 @@ const TabScreenOptions = props => {
     tabBarStyle: {...styles.tabStyle},
     tabBarLabelStyle: styles.tabBarLabel,
     headerTitleStyle: {fontSize: 18, color: Color.PinkishPurple},
+  };
+};
+
+const TopBarScreenOptions = props => {
+  return {
+    tabBarActiveTintColor: Color.PinkishPurple,
+    tabBarInactiveTintColor: Color.MoodyBlue,
+    tabBarIndicatorStyle: {backgroundColor: Color.PinkishPurple},
+    tabBarLabelStyle: {fontFamily: FONT_NAME.BOLD, fontSize: 14},
+    // tabBarStyle: {...styles.tabStyle},
+    // tabBarLabelStyle: styles.tabBarLabel,
+    // headerTitleStyle: {fontSize: 18, color: Color.PinkishPurple},
   };
 };
 
@@ -45,14 +59,32 @@ const getRouteData = (routeName, focused) => {
   }
   return data;
 };
+const TopBar = createMaterialTopTabNavigator();
+function MyTabs() {
+  return (
+    <TopBar.Navigator
+      screenOptions={TopBarScreenOptions}
+      backBehavior="firstRoute">
+      <TopBar.Screen name={SCREEN_TYPE.ALL_EVENT.name} component={MyEvents} />
 
+      <TopBar.Screen name={SCREEN_TYPE.PAST_EVENT.name} component={MyEvents} />
+      <TopBar.Screen
+        name={SCREEN_TYPE.FUTURE_EVENT.name}
+        component={MyEvents}
+      />
+    </TopBar.Navigator>
+  );
+}
 const TabNavigation = () => {
   return (
-    <Tab.Navigator screenOptions={TabScreenOptions}>
-      <Tab.Screen name={SCREEN_TYPE.MY_EVENTS.name} component={MyEvents} />
-      <Tab.Screen name={SCREEN_TYPE.ALL_EVENTS.name} component={AllEvents} />
-      <Tab.Screen name={SCREEN_TYPE.ACCOUNT.name} component={Account} />
-    </Tab.Navigator>
+    <BottomTab.Navigator screenOptions={TabScreenOptions}>
+      <BottomTab.Screen name={SCREEN_TYPE.MY_EVENTS.name} component={MyTabs} />
+      <BottomTab.Screen
+        name={SCREEN_TYPE.ALL_EVENTS.name}
+        component={AllEvents}
+      />
+      <BottomTab.Screen name={SCREEN_TYPE.ACCOUNT.name} component={Account} />
+    </BottomTab.Navigator>
   );
 };
 

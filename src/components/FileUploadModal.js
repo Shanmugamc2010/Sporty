@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Color from '../utils/themes/colors';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const FileUploadModal = ({visible, onClose, onCameraPress, onFilePress}) => {
   return (
     <Modal
@@ -20,10 +21,18 @@ const FileUploadModal = ({visible, onClose, onCameraPress, onFilePress}) => {
           <TouchableWithoutFeedback>
             <View style={styles.iconContainer}>
               <TouchableOpacity onPress={onCameraPress}>
-                <Text>Open Camera</Text>
+                <MaterialIcons
+                  name={'camera-alt'}
+                  size={50}
+                  color={Color.White}
+                />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFilePress}>
-                <Text>Open File Picker</Text>
+                <MaterialIcons
+                  name={'upload-file'}
+                  size={50}
+                  color={Color.White}
+                />
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
@@ -41,11 +50,11 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     height: '20%',
-    backgroundColor: 'white',
+    backgroundColor: Color.MoodyBlue,
     padding: 20,
     borderRadius: 10,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
 });

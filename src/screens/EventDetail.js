@@ -12,10 +12,24 @@ import {
 import Color from '../utils/themes/colors';
 import {FONT_NAME} from '../utils/themes/FontName';
 import {SCREEN_TYPE} from '../utils/themes/constant';
+import {apiCall} from '../apimanager/ApiManager';
+import {ApiNetwork} from '../apimanager/ApiNetwork';
+import {isAfterOrEqualDate, isValidString} from '../utils/helper';
 const EventDetail = ({route, navigation}) => {
-  const {title} = route.params;
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [tournamentData, setTournamentData] = useState([]);
+  useEffect(() => {
+    getTournamentData();
+  }, []);
+  const getTournamentData = async () => {
+    const response = await apiCall(
+      ApiNetwork.getTournamentApiCall({
+        tournamentId: route.params.tournamentId,
+      }),
+    );
+    setTournamentData(response?.data);
+  };
 
   const scrollToIndex = index => {
     flatListRef.current.scrollToIndex({animated: true, index});
@@ -36,10 +50,11 @@ const EventDetail = ({route, navigation}) => {
     return <View style={styles.seperatorStyle} />;
   };
   const gameDetailItem = (key, value) => {
+    let val = isValidString(value) ? value : '';
     return (
       <View style={styles.gameDetailContainer}>
         <Text style={styles.gameDetailKeyText}>{`${key}`}</Text>
-        <Text style={styles.gameDetailValueStyle}>{`: ${value}`}</Text>
+        <Text style={styles.gameDetailValueStyle}>{`: ${val}`}</Text>
       </View>
     );
   };
@@ -80,56 +95,60 @@ const EventDetail = ({route, navigation}) => {
       </View>
     );
   };
+  const keysToRemove = [
+    'tournamentId',
+    'gameTypeId',
+    'uploadedDocument1',
+    'uploadedDocument2',
+    'uploadedDocument3',
+    'statusId',
+    'gameType',
+  ];
 
   const renderDetails = () => {
     return (
       <>
-        {gameDetailItem('Conducted By', 'Manoj')}
-        {gameDetailItem('Venue', 'Chennai')}
-        {gameDetailItem('Game Type', 'Cricket')}
-        {gameDetailItem('Gender', 'Male')}
-        {gameDetailItem('State', 'Tamil Nady')}
-        {gameDetailItem('District', 'Theni')}
-        {gameDetailItem('Start Date', '10/11/2021')}
-        {gameDetailItem('End Date', '10/11/2021')}
-        {gameDetailItem('Last Date Of Registration', '10/11/2021')}
-        {gameDetailItem('Registration Link', '10/11/2021')}
-        {gameDetailItem('Contact Email', 'manoj.s@foodhub.com')}
-        {gameDetailItem('Contact Number1', '8531896253')}
-        {gameDetailItem('Contact Number2', '8531896253')}
-        {gameDetailItem('Prize Money', '1000 rupees')}
-        {gameDetailItem('Prize Details', 'Trophy')}
-        {gameDetailItem('Game Rules', '-')}
+        {Object.entries(tournamentData)
+          .filter(([key]) => !keysToRemove.includes(key))
+          .map(([key, value]) => {
+            return (
+              <View key={key}>{gameDetailItem(key, value?.toString())}</View>
+            );
+          })}
       </>
     );
   };
 
   const onEditPress = () => {
-    const eventDetails = {
-      titleProps: 'Manoj Trophy',
-      conductedProps: 'Manoj',
-      venueProps: 'Chennai',
-      gameTypeProps: 'Cricket',
-      registerProps: 'manoj.com',
-      emailProps: 'manoj.s@foodhub.com',
-      contact1Props: '123',
-      contact2Props: '123',
-      prizeMoneyProps: '10',
-      prizeDetailsProps: 'none',
-      rulesProps: 'win',
-    };
     navigation.navigate(SCREEN_TYPE.ADD_EVENTS.name, {
-      eventDetails,
+      eventDetails: tournamentData,
+      isUpdateTournament: true,
     });
+  };
+
+  const isEventEditable = () => {
+    let res = false;
+    if (tournamentData.startDate) {
+      res = tournamentData
+        ? isAfterOrEqualDate(tournamentData.startDate, new Date())
+        : false;
+    }
+    return res;
   };
 
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.headerTextStyle}>{title}</Text>
-        <TouchableOpacity style={styles.headerContainer} onPress={onEditPress}>
-          <Text style={styles.editTextStyle}>Edit</Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTextStyle}>
+          {tournamentData?.tournamentTitle}
+        </Text>
+        {isEventEditable() ? (
+          <TouchableOpacity
+            style={styles.headerContainer}
+            onPress={onEditPress}>
+            <Text style={styles.editTextStyle}>Edit</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
       {lineSeperator()}
       <ScrollView style={styles.scrollViewStyle}>

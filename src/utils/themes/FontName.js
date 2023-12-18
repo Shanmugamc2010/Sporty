@@ -8,4 +8,5 @@ export const FONT_NAME = {
   PERSON_FILL: 'person',
   PERSON_UNFILL: 'person-outline',
   CANCEL: 'cancel',
+  CAMERA: 'camera-alt',
 };

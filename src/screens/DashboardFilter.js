@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -9,49 +9,115 @@ import {
 } from 'react-native';
 import Color from '../utils/themes/colors';
 import SportyButton from '../components/SportyButton';
+import {useSelector} from 'react-redux';
+import {apiCall} from '../apimanager/ApiManager';
+import {ApiNetwork} from '../apimanager/ApiNetwork';
+import {GAME_TYPE, GENDER} from '../utils/themes/constant';
 
-const onClickRenderItem = () => {};
-
-const renderItem = ({item, index}) => {
-  return (
-    <TouchableOpacity
-      onPress={onClickRenderItem}
-      style={index === 0 ? styles.selecteditem : styles.item}>
-      <Text
-        style={[
-          styles.filterTypeText,
-          index === 0 ? {fontWeight: '600'} : null,
-        ]}>
-        {item}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-const renderFilterValuesItem = ({item}) => {
-  return (
-    <TouchableOpacity onPress={onClickRenderItem} style={styles.valuesitem}>
-      <Image
-        source={require('./../assets/images/unchecked.png')}
-        style={styles.checkBox}
-      />
-      <Text style={styles.filterTypeText}>{item}</Text>
-    </TouchableOpacity>
-  );
+const FIELD_TYPE = {
+  STATE: 'state',
+  GAME: 'game',
+  GENDER: 'gender',
+  CATEGORY: 'category',
 };
 
 const DashboardFilter = props => {
-  const filterTypes = ['State', 'District', 'Game', 'Gender', 'Category'];
-  const filterValues = [
-    'Andhra Pradesh',
-    'Arunachal Pradesh',
-    'Assam',
-    'Bihar',
-    'Chhattisgarh',
-    'Goa',
-    'Gujarat',
-    'Haryana',
-    'Himachal Pradesh',
-  ];
+  const [selectedType, setSelectedType] = useState(FIELD_TYPE.STATE);
+  const [checkedItems, setCheckedItems] = useState({
+    state: [],
+    gender: [],
+    game: [],
+    category: [],
+  });
+  const stateDataSelector = useSelector(state => state.stateData);
+  const filterTypes = [FIELD_TYPE.STATE, FIELD_TYPE.GAME, FIELD_TYPE.GENDER];
+  useEffect(() => {
+    // Access myFunction from the navigation options
+    const myFunction = props.navigation.getState();
+    console.log(myFunction);
+
+    // Now you can use myFunction in this component
+    // if (myFunction) {
+    //   console.log(myFunction);
+    // }
+  }, []);
+  const filterValues = () => {
+    let data = [];
+    if (selectedType === FIELD_TYPE.STATE) {
+      data = stateDataSelector;
+    } else if (selectedType === FIELD_TYPE.GAME) {
+      data = Object.values(GAME_TYPE);
+    } else if (selectedType === FIELD_TYPE.GENDER) {
+      data = Object.values(GENDER);
+    }
+    return data;
+  };
+  const onClickRenderItem = type => {
+    setSelectedType(type);
+  };
+  console.log(checkedItems);
+
+  const renderItem = ({item, index}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => onClickRenderItem(item)}
+        style={item === selectedType ? styles.selecteditem : styles.item}>
+        <Text
+          style={[
+            styles.filterTypeText,
+            index === 0 ? {fontWeight: '600'} : null,
+          ]}>
+          {item}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+  const onClickRenderValueItem = item => {
+    if (checkedItems[selectedType].includes(item)) {
+      setCheckedItems(prevItems => {
+        return {
+          ...prevItems,
+          [selectedType]: prevItems[selectedType].filter(i => i !== item),
+        };
+      });
+    } else {
+      setCheckedItems(prevItems => {
+        return {
+          ...prevItems,
+          [selectedType]: [...prevItems[selectedType], item],
+        };
+      });
+    }
+  };
+  const renderFilterValuesItem = ({item}) => {
+    const isChecked = checkedItems[selectedType].includes(item);
+    return (
+      <TouchableOpacity
+        onPress={() => onClickRenderValueItem(item)}
+        style={styles.valuesitem}>
+        <Image
+          source={
+            isChecked
+              ? require('./../assets/images/checked.png')
+              : require('./../assets/images/unchecked.png')
+          }
+          style={styles.checkBox}
+        />
+        <Text style={styles.filterTypeText}>{item}</Text>
+      </TouchableOpacity>
+    );
+  };
+  const clearFilter = () => {
+    setCheckedItems({
+      state: [],
+      gender: [],
+      game: [],
+      category: [],
+    });
+  };
+  const onApplyPress = () => {
+    props.navigation.goBack();
+  };
   return (
     <View style={styles.container}>
       <View style={styles.mainView}>
@@ -61,7 +127,7 @@ const DashboardFilter = props => {
           showsVerticalScrollIndicator={false}
         />
         <FlatList
-          data={filterValues}
+          data={filterValues()}
           renderItem={renderFilterValuesItem}
           showsVerticalScrollIndicator={false}
         />
@@ -76,15 +142,10 @@ const DashboardFilter = props => {
           />
         </View>
         <View style={styles.fullView}>
-          <SportyButton title={'Reset'} />
+          <SportyButton title={'Reset'} onPress={clearFilter} />
         </View>
         <View style={styles.fullView}>
-          <SportyButton
-            title={'Apply'}
-            onPress={() => {
-              props.navigation.goBack();
-            }}
-          />
+          <SportyButton title={'Apply'} onPress={onApplyPress} />
         </View>
       </View>
     </View>

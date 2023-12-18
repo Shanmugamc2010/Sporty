@@ -13,12 +13,18 @@ import Color from '../utils/themes/colors';
 import {SportyInputText} from '../components/SprtyInput';
 import SportyButton from '../components/SportyButton';
 import DateTimePicker from '../components/DateTimePicker';
-import moment from 'moment';
-import {EVENT_TYPES} from '../utils/themes/constant';
+import {
+  EVENT_TYPES,
+  GAME_TYPE,
+  GENDER,
+  SCREEN_TYPE,
+  gender,
+} from '../utils/themes/constant';
 import {
   isAfterOrEqualDate,
   isBeforeOrEqualDate,
   isValidString,
+  formatDate,
 } from '../utils/helper';
 import {FONT_NAME} from '../utils/themes/FontName';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -29,76 +35,128 @@ import {useSelector} from 'react-redux';
 import {getStateData} from '../Redux/Selector';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
+import {CommonActions} from '@react-navigation/native';
 
 const AddEvent = props => {
-  const {
-    titleProps,
-    conductedProps,
-    venueProps,
-    gameTypeProps,
-    registerProps,
-    emailProps,
-    contact1Props,
-    contact2Props,
-    prizeMoneyProps,
-    prizeDetailsProps,
-    rulesProps,
-  } = props.route.params.eventDetails || {};
+  const isUpdateTournament = props?.route?.params?.isUpdateTournament;
+  const eventDetails = props?.route?.params?.eventDetails;
   const stateDataSelector = useSelector(state => getStateData(state));
-  const [title, setTitle] = useState(titleProps || '');
-  const [conductedBy, setConductedBy] = useState(conductedProps || '');
-  const [venue, setVenue] = useState(venueProps || '');
-  const [gameType, setGameType] = useState(gameTypeProps || '');
-  const [registerLink, setRegisterLink] = useState(registerProps || '');
-  const [email, setEmail] = useState(emailProps || '');
-  const [contact1, setContact1] = useState(contact1Props || '');
-  const [contact2, setContact2] = useState(contact2Props || '');
-  const [prizeMoney, setPrizeMoney] = useState(prizeMoneyProps || '');
-  const [prizeDetails, setPrizeDetails] = useState(prizeDetailsProps || '');
-  const [rules, setRules] = useState(rulesProps || '');
+  const [title, setTitle] = useState(eventDetails?.tournamentTitle || '');
+  const [conductedBy, setConductedBy] = useState(
+    eventDetails?.conductedBy || '',
+  );
+  const [venue, setVenue] = useState(eventDetails?.venue || '');
+  const [gameType, setGameType] = useState({
+    gameType:
+      Object.values(GAME_TYPE)[eventDetails?.gameTypeId?.toString()] || '',
+    gameTypeId: eventDetails?.gameTypeId || '',
+  });
+
+  const [registerLink, setRegisterLink] = useState(
+    eventDetails?.registrationUrl || '',
+  );
+  const [email, setEmail] = useState(eventDetails?.contactEmail || '');
+  const [contact1, setContact1] = useState(eventDetails?.contactNumber1 || '');
+  const [contact2, setContact2] = useState(eventDetails?.contactNumber2 || '');
+  const [prizeMoney, setPrizeMoney] = useState(
+    eventDetails?.totalPrizeMoney?.toString() || '',
+  );
+  const [prizeDetails, setPrizeDetails] = useState(
+    eventDetails?.prizeDetails || '',
+  );
+  const [rules, setRules] = useState(eventDetails?.rulesandRegulation || '');
 
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [eventStart, setEventStart] = useState({date: '', displayDate: ''});
-  const [eventEnd, setEventEnd] = useState({date: '', displayDate: ''});
+
+  const [eventStart, setEventStart] = useState({
+    date: eventDetails?.startDate || '',
+    displayDate: eventDetails?.startDate
+      ? formatDate(eventDetails?.startDate)
+      : '',
+  });
+  const [eventEnd, setEventEnd] = useState({
+    date: eventDetails?.endDate || '',
+    displayDate: eventDetails?.endDate ? formatDate(eventDetails?.endDate) : '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [sportyModalVisible, setSportyModalVisible] = useState(false);
   const [registrationEnd, setRegistrationEnd] = useState({
-    date: '',
-    displayDate: '',
+    date: eventDetails?.lastDateForRegistration || '',
+    displayDate: eventDetails?.lastDateForRegistration
+      ? formatDate(eventDetails?.lastDateForRegistration)
+      : '',
   });
   const [activeField, setActiveField] = useState('');
-  const [genderData, setGenderData] = useState('');
-  const [stateData, setStateData] = useState('');
+  const [genderData, setGenderData] = useState(eventDetails?.gender || '');
+  const [stateData, setStateData] = useState(eventDetails?.state || '');
   const [districtList, setDistrictList] = useState([]);
-  const [districtData, setDistrictData] = useState('');
-  const [selectedImages, setSelectedImages] = useState([
-    {
-      name: require('/Users/dev/Sporty/src/assets/images/Logo.png'),
-    },
-    {
-      name: require('/Users/dev/Sporty/src/assets/images/Logo.png'),
-    },
-    {
-      name: require('/Users/dev/Sporty/src/assets/images/Logo.png'),
-    },
-    {
-      name: require('/Users/dev/Sporty/src/assets/images/Logo.png'),
-    },
-  ]);
-  const gender = ['MALE', 'FEMALE', 'OTHERS'];
+  const [districtData, setDistrictData] = useState(
+    eventDetails?.district || '',
+  );
+  const [selectedImages, setSelectedImages] = useState([]);
+
+  const makeAddEventCall = async () => {
+    const uploadedDocuments = selectedImages.reduce((acc, image, index) => {
+      const dynamicKey = `uploadedDocument${index + 1}`;
+      const result = {
+        ...acc,
+        [dynamicKey]: image.base64,
+      };
+
+      return result;
+    }, {});
+    const params = {
+      tournamentTitle: title,
+      venue,
+      gameType: parseInt(gameType.gameTypeId, 10),
+      gender: genderData,
+      state: stateData,
+      district: districtData,
+      startDate: eventStart.date.toISOString(),
+      endDate: eventEnd.date.toISOString(),
+      registrationUrl: registerLink,
+      lastDateForRegistration: registrationEnd.date.toISOString(),
+      contactEmail: email,
+      contactNumber1: contact1,
+      contactNumber2: contact2,
+      rulesandRegulation: rules,
+      prizeDetails,
+      totalPrizeMoney: parseInt(prizeMoney, 10),
+      // winnerPrizeAmount: 0,
+      // runnerPrizeAmount: 0,
+      // secondRunnerPrizeAmount: 0,
+      uploadedDocument1: '',
+      conductedBy,
+      ...uploadedDocuments,
+    };
+    const response = isUpdateTournament
+      ? await apiCall(ApiNetwork.makeUpdateTournamentApiCall(params))
+      : await apiCall(ApiNetwork.makeAddTournamentApiCall(params));
+    if (response?.message === 'Successfully Created') {
+      console.log('called===>');
+      props.navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: SCREEN_TYPE.TAB_NAVIGATOR.name}],
+        }),
+      );
+    }
+  };
   const flatListData = () => {
     if (activeField === EVENT_TYPES.GENDER) {
-      return gender;
+      return GENDER;
     } else if (activeField === EVENT_TYPES.STATE) {
       return stateDataSelector;
     } else if (activeField === EVENT_TYPES.DISTRICT) {
       return districtList;
+    } else if (activeField === EVENT_TYPES.GAMETYPE) {
+      return Object.values(GAME_TYPE);
     }
     return [];
   };
 
   const openSportyModal = fieldName => {
-    if (fieldName === EVENT_TYPES.DISTRICT && !isValidString(districtData)) {
+    if (fieldName === EVENT_TYPES.DISTRICT && !isValidString(stateData)) {
       return Alert.alert('Select State');
     }
 
@@ -114,6 +172,11 @@ const AddEvent = props => {
       getDistrictData(data);
     } else if (activeField === EVENT_TYPES.DISTRICT) {
       setDistrictData(data);
+    } else if (activeField === EVENT_TYPES.GAMETYPE) {
+      setGameType({
+        gameType: data,
+        gameTypeId: Object.values(GAME_TYPE).indexOf(data) + 1,
+      });
     }
     setSportyModalVisible(false);
   };
@@ -134,7 +197,6 @@ const AddEvent = props => {
       } else {
         console.log('Camera Response:', response);
       }
-      setModalVisible(false);
     });
   };
 
@@ -143,19 +205,23 @@ const AddEvent = props => {
   };
 
   const handleFilePress = () => {
-    launchImageLibrary({}, response => {
+    launchImageLibrary({includeBase64: true}, async response => {
       if (response.error) {
         Alert.alert('Error', 'Failed to open file picker');
       } else {
-        console.log('File Picker Response:', response);
+        if (!response?.didCancel) {
+          // setSelectedImages(prev => [
+          //   ...prev,
+          //   {uri: response.assets[0]?.uri, base64: response.assets[0]?.base64},
+          // ]);
+        }
+        setModalVisible(false);
       }
-      setModalVisible(false);
     });
   };
   const handleUploadPress = () => {
     setModalVisible(true);
   };
-
   const onSelect = date => {
     if (activeField === EVENT_TYPES.EVENT_START) {
       const isDateBeforeOrEqualToEndDate = isValidString(eventEnd.date)
@@ -208,11 +274,6 @@ const AddEvent = props => {
     setShowDatePicker(false);
   };
 
-  const formatDate = date => {
-    const formattedDate = new Date(date);
-    return moment(formattedDate).format('D/M/YY H:mm A');
-  };
-
   const openDatePicker = useCallback(
     eventType => {
       setShowDatePicker(true);
@@ -220,6 +281,45 @@ const AddEvent = props => {
     },
     [setShowDatePicker, setActiveField],
   );
+
+  const renderImageUpload = () => {
+    const showUploadButton = selectedImages.length < 3;
+    return (
+      <View style={styles.docUploadContainer}>
+        <Text style={styles.docUploadHeaderStyle}>
+          {'Upload Document\t(Max: 3)'}
+        </Text>
+        <View style={styles.imageViewStyle}>
+          {selectedImages.map((data, index) => (
+            <View key={index} style={styles.docImageContainerStyle}>
+              <Image
+                source={{uri: `data:image/jpg;base64,${data.base64}`}}
+                style={styles.docImageStyle}
+              />
+
+              <TouchableOpacity
+                onPress={() => {
+                  const updatedImages = [...selectedImages];
+                  updatedImages.splice(index, 1);
+                  setSelectedImages(updatedImages);
+                }}>
+                <MaterialIcons name={FONT_NAME.CANCEL} size={15} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+        {showUploadButton ? (
+          <TouchableOpacity
+            style={styles.uploadButtonStyle}
+            onPress={() => {
+              handleUploadPress();
+            }}>
+            <Text style={styles.uploadTextStyle}>UPLOAD</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -242,11 +342,15 @@ const AddEvent = props => {
         value={venue}
         onChangeText={text => setVenue(text)}
       />
-      <SportyInputText
-        placeholder="Game Type"
-        leftIcon={require('../assets/images/mail.png')}
-        value={gameType}
-      />
+      <TouchableOpacity onPress={() => openSportyModal(EVENT_TYPES.GAMETYPE)}>
+        <SportyInputText
+          editable={false}
+          placeholder="Game Type"
+          leftIcon={require('../assets/images/mail.png')}
+          value={gameType.gameType}
+          onPressIn={() => openSportyModal(EVENT_TYPES.GAMETYPE)}
+        />
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => openSportyModal(EVENT_TYPES.GENDER)}>
         <SportyInputText
           editable={false}
@@ -308,12 +412,14 @@ const AddEvent = props => {
         leftIcon={require('../assets/images/location.png')}
         value={registerLink}
         onChangeText={text => setRegisterLink(text)}
+        autoCapitalize="none"
       />
       <SportyInputText
         placeholder="Contact Email"
         leftIcon={require('../assets/images/mail.png')}
         value={email}
         onChangeText={text => setEmail(text)}
+        autoCapitalize="none"
       />
       <SportyInputText
         placeholder="Contact Number 1"
@@ -351,33 +457,11 @@ const AddEvent = props => {
         value={rules}
         onChangeText={text => setRules(text)}
       />
-      <View style={styles.docUploadContainer}>
-        <Text style={styles.docUploadHeaderStyle}>Upload Document</Text>
-        <ScrollView horizontal={true}>
-          {selectedImages.map((image, index) => (
-            <View key={index} style={styles.docImageContainerStyle}>
-              <Image source={image.name} style={styles.docImageStyle} />
-
-              <TouchableOpacity
-                onPress={() => {
-                  const updatedImages = [...selectedImages];
-                  updatedImages.splice(index, 1);
-                  setSelectedImages(updatedImages);
-                }}>
-                <MaterialIcons name={FONT_NAME.CANCEL} size={15} />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-        <TouchableOpacity
-          style={styles.uploadButtonStyle}
-          onPress={() => {
-            handleUploadPress();
-          }}>
-          <Text style={styles.uploadTextStyle}>UPLOAD</Text>
-        </TouchableOpacity>
-      </View>
-      <SportyButton onPress={() => {}} title={'CREATE'} />
+      {renderImageUpload()}
+      <SportyButton
+        onPress={makeAddEventCall}
+        title={isUpdateTournament ? 'UPDATE' : 'CREATE'}
+      />
       {showDatePicker ? (
         <DateTimePicker onSelect={onSelect} onCancel={onCancel} />
       ) : null}
@@ -439,6 +523,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: Color.White,
     fontFamily: FONT_NAME.SEMI_BOLD,
+  },
+  scrollViewStyle: {
+    justifyContent: 'center',
+  },
+  imageViewStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
 });
 

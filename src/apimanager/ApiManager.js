@@ -24,12 +24,10 @@ API.interceptors.response.use(
 );
 
 export const apiCall = async params => {
-  console.log(params);
   const response = await API[params.method.toLowerCase()](
     params.url,
     params.data,
   );
-  console.log(response);
   return response;
   // const response = await axiosInstance.post(api);
   // console.log(response);

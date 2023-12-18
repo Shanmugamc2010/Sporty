@@ -12,7 +12,6 @@ const AppBar = props => {
       props.navigation.goBack();
     }
   };
-  console.log(props.options);
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.headerLeft} onPress={onClickLeftIcon}>

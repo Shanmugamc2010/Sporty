@@ -46,6 +46,18 @@ export const SCREEN_TYPE = {
     name: 'Events',
     title: 'Events',
   },
+  PAST_EVENT: {
+    name: 'Past',
+    title: 'Past',
+  },
+  FUTURE_EVENT: {
+    name: 'Future',
+    title: 'Future',
+  },
+  ALL_EVENT: {
+    name: 'All',
+    title: 'All',
+  },
 };
 
 export const EVENT_TYPES = {
@@ -55,4 +67,22 @@ export const EVENT_TYPES = {
   GENDER: 'gender',
   STATE: 'state',
   DISTRICT: 'district',
+  GAMETYPE: 'gameType',
 };
+
+export const GAME_TYPE = {
+  CRICKET: 'Cricket',
+  VOLLEYBALL: 'VolleyBall',
+  HOCKEY: 'Hockey',
+  BASKETBALL: 'BasketBall',
+  BATMITON: 'Batmiton',
+  BALLBATMITON: 'Ball Batmiton',
+  THROWBALL: 'ThrowBall',
+  CHESS: 'Chess',
+  CARROM: 'Carrom',
+  FOOTBALL: 'FootBall',
+  SQUASH: 'Squash',
+  TENNIS: 'Tennis',
+  KABBADI: 'Kabbadi',
+};
+export const GENDER = ['MALE', 'FEMALE', 'OTHERS'];

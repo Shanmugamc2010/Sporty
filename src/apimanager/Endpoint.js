@@ -4,4 +4,8 @@ export const ENDPOINTS = {
   User: '/api/Account/User',
   State: '/api/StateDistrict/State',
   District: '/api/StateDistrict/District',
+  AddTournament: '/api/Tournament/Add Tournament',
+  GetTournaments: 'api/Tournament/GetTournaments',
+  GetTournament: 'api/Tournament/GetTournament',
+  UpdateTournament: 'api/Tournament/UpdateTournament',
 };

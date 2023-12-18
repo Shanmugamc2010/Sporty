@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,66 +10,73 @@ import {
 import Color from '../utils/themes/colors';
 import SportyButton from '../components/SportyButton';
 import {SCREEN_TYPE} from '../utils/themes/constant';
+import {apiCall} from '../apimanager/ApiManager';
+import {ApiNetwork} from '../apimanager/ApiNetwork';
+import {useRoute} from '@react-navigation/native';
+import {isAfterDate, isBeforeDate} from '../utils/helper';
 
 const MyEvents = props => {
-  const DATA = [
-    {
-      id: 1,
-      title: 'Cricket',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage.jpg'),
-    },
-    {
-      id: 2,
-      title: 'Football',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage2.jpg'),
-    },
-    {
-      id: 3,
-      title: 'Volly Ball',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage3.jpg'),
-    },
-    {
-      id: 4,
-      title: 'Cricket',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage.jpg'),
-    },
-    {
-      id: 5,
-      title: 'Football',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage2.jpg'),
-    },
-    {
-      id: 6,
-      title: 'Volly Ball',
-      subtitle: 'Tournament',
-      image: require('../assets/images/flatimage3.jpg'),
-    },
-  ];
+  const [tournamentData, setTournamentData] = useState([]);
+  const route = useRoute();
+  useEffect(() => {
+    getTournamentsData();
+  }, []);
+  const getTournamentsData = async () => {
+    const response = await apiCall(
+      ApiNetwork.getTournamentsApiCall({
+        pageNo: 1,
+        rowsPerPage: 100,
+        Status: 1,
+      }),
+    );
+    getFlatListData(response?.result);
+  };
 
-  const onClickItem = () => {
+  const getFlatListData = res => {
+    const currentDate = new Date();
+    let data = [];
+    if (route.name === SCREEN_TYPE.ALL_EVENT.name) {
+      data = res;
+    } else if (route.name === SCREEN_TYPE.PAST_EVENT.name) {
+      data = res.filter(value => isBeforeDate(value.startDate, currentDate));
+    } else if (route.name === SCREEN_TYPE.FUTURE_EVENT.name) {
+      data = res.filter(value => isAfterDate(value.startDate, currentDate));
+    }
+    setTournamentData(data);
+  };
+
+  const onClickItem = item => {
     props.navigation.navigate(SCREEN_TYPE.EVENT_DETAIL.name, {
-      title: 'Manoj Trophy',
-      conductedBy: 'Manoj',
+      tournamentId: item.tournamentId,
     });
   };
   const onClickFilterOption = () => {
-    props.navigation.navigate(SCREEN_TYPE.DASHBOARD_FILTER.name);
+    props.navigation.navigate(SCREEN_TYPE.DASHBOARD_FILTER.name, {
+      tournamentData,
+    });
+    props.navigation.setOptions({
+      onApplyPress: () => {},
+    });
   };
   const onClickAddEventOption = () => {
     props.navigation.navigate(SCREEN_TYPE.ADD_EVENTS.name);
   };
   const renderItem = ({item}) => {
+    const isValidImage =
+      item?.uploadedDocument1 !== '' && item?.uploadedDocument1 !== 'string';
     return (
-      <TouchableOpacity onPress={onClickItem} style={styles.item}>
-        <Image style={styles.imageStyle} source={item.image} />
+      <TouchableOpacity onPress={() => onClickItem(item)} style={styles.item}>
+        <Image
+          style={styles.imageStyle}
+          source={
+            isValidImage
+              ? {uri: `data:image/jpg;base64,${item?.uploadDocument1}`}
+              : require('../assets/images/flatimage3.jpg')
+          }
+        />
         <View style={styles.viewStle}>
-          <Text style={styles.subTitleStyle}>{item.subtitle}</Text>
-          <Text style={styles.titleStyle}>{item.title}</Text>
+          <Text style={styles.subTitleStyle}>{item.venue}</Text>
+          <Text style={styles.titleStyle}>{item.tournamentTitle}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -78,9 +85,9 @@ const MyEvents = props => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={DATA}
+        data={tournamentData}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => index}
         showsVerticalScrollIndicator={false}
       />
       <View style={styles.footerStyle}>
