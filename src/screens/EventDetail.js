@@ -75,15 +75,15 @@ const EventDetail = ({route, navigation}) => {
           data={[
             {
               id: '1',
-              image: require('/Users/dev/Sporty/src/assets/images/image.jpeg'),
+              image: null,
             },
             {
               id: '2',
-              image: require('/Users/dev/Sporty/src/assets/images/image1.jpeg'),
+              image: null,
             },
             {
               id: '3',
-              image: require('/Users/dev/Sporty/src/assets/images/image2.jpeg'),
+              image: null,
             },
           ]}
           keyExtractor={item => item.id}
