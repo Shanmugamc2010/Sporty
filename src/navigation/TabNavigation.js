@@ -78,11 +78,11 @@ function MyTabs() {
 const TabNavigation = () => {
   return (
     <BottomTab.Navigator screenOptions={TabScreenOptions}>
-      <BottomTab.Screen name={SCREEN_TYPE.MY_EVENTS.name} component={MyTabs} />
       <BottomTab.Screen
         name={SCREEN_TYPE.ALL_EVENTS.name}
-        component={AllEvents}
+        component={MyEvents}
       />
+      <BottomTab.Screen name={SCREEN_TYPE.MY_EVENTS.name} component={MyTabs} />
       <BottomTab.Screen name={SCREEN_TYPE.ACCOUNT.name} component={Account} />
     </BottomTab.Navigator>
   );

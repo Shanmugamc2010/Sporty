@@ -17,6 +17,8 @@ import {isAfterDate, isBeforeDate} from '../utils/helper';
 
 const MyEvents = props => {
   const [tournamentData, setTournamentData] = useState([]);
+  const [filteredData, setFilteredData] = useState(null);
+  const [filterValues, setFilterValues] = useState(null);
   const route = useRoute();
   useEffect(() => {
     getTournamentsData();
@@ -35,7 +37,10 @@ const MyEvents = props => {
   const getFlatListData = res => {
     const currentDate = new Date();
     let data = [];
-    if (route.name === SCREEN_TYPE.ALL_EVENT.name) {
+    if (
+      route.name === SCREEN_TYPE.ALL_EVENT.name ||
+      route.name === SCREEN_TYPE.ALL_EVENTS.name
+    ) {
       data = res;
     } else if (route.name === SCREEN_TYPE.PAST_EVENT.name) {
       data = res.filter(value => isBeforeDate(value.startDate, currentDate));
@@ -53,9 +58,9 @@ const MyEvents = props => {
   const onClickFilterOption = () => {
     props.navigation.navigate(SCREEN_TYPE.DASHBOARD_FILTER.name, {
       tournamentData,
-    });
-    props.navigation.setOptions({
-      onApplyPress: () => {},
+      setFilteredData,
+      setFilterValues,
+      filterValues,
     });
   };
   const onClickAddEventOption = () => {
@@ -85,15 +90,17 @@ const MyEvents = props => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={tournamentData}
+        data={filteredData ? filteredData : tournamentData}
         renderItem={renderItem}
         keyExtractor={(item, index) => index}
         showsVerticalScrollIndicator={false}
       />
       <View style={styles.footerStyle}>
-        <View style={styles.fullView}>
-          <SportyButton title={'Filter'} onPress={onClickFilterOption} />
-        </View>
+        {route?.name === SCREEN_TYPE.ALL_EVENTS.name ? (
+          <View style={styles.fullView}>
+            <SportyButton title={'Filter'} onPress={onClickFilterOption} />
+          </View>
+        ) : null}
         <View style={styles.fullView}>
           <SportyButton title={'Add Event'} onPress={onClickAddEventOption} />
         </View>

@@ -5,6 +5,7 @@ import {
   REQUEST_API_FAILURE,
   SET_INITIAL_APP_OPEN,
   SET_STATE_DISTRICT_DATA,
+  LOGOUT_SUCCESS,
 } from './Type';
 
 const initialState = {
@@ -41,7 +42,11 @@ export const mainReducer = (state = initialState, action) => {
         ...state,
         stateData: action.payload,
       };
-
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        loginData: null,
+      };
     default:
       return state;
   }

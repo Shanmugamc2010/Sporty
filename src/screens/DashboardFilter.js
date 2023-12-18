@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -23,24 +23,16 @@ const FIELD_TYPE = {
 
 const DashboardFilter = props => {
   const [selectedType, setSelectedType] = useState(FIELD_TYPE.STATE);
-  const [checkedItems, setCheckedItems] = useState({
-    state: [],
-    gender: [],
-    game: [],
-    category: [],
-  });
+  const [checkedItems, setCheckedItems] = useState(
+    props.route.params?.filterValues || {
+      state: [],
+      gender: [],
+      game: [],
+      category: [],
+    },
+  );
   const stateDataSelector = useSelector(state => state.stateData);
   const filterTypes = [FIELD_TYPE.STATE, FIELD_TYPE.GAME, FIELD_TYPE.GENDER];
-  useEffect(() => {
-    // Access myFunction from the navigation options
-    const myFunction = props.navigation.getState();
-    console.log(myFunction);
-
-    // Now you can use myFunction in this component
-    // if (myFunction) {
-    //   console.log(myFunction);
-    // }
-  }, []);
   const filterValues = () => {
     let data = [];
     if (selectedType === FIELD_TYPE.STATE) {
@@ -55,7 +47,6 @@ const DashboardFilter = props => {
   const onClickRenderItem = type => {
     setSelectedType(type);
   };
-  console.log(checkedItems);
 
   const renderItem = ({item, index}) => {
     return (
@@ -112,10 +103,32 @@ const DashboardFilter = props => {
       state: [],
       gender: [],
       game: [],
-      category: [],
     });
   };
   const onApplyPress = () => {
+    const data = [...props.route.params?.tournamentData];
+    const filteredData = data.reduce((acc, curr) => {
+      console.log(Object.values(GAME_TYPE)[parseInt(curr?.gameType, 10)]);
+      if (
+        checkedItems?.state?.includes(curr.state) ||
+        checkedItems?.gender?.includes(curr.gender) ||
+        checkedItems?.game?.includes(
+          Object.values(GAME_TYPE)[parseInt(curr?.gameType, 10) - 1],
+        )
+      ) {
+        console.log('called');
+        return [...acc, curr];
+      } else {
+        return acc;
+      }
+    }, []);
+    console.log(filteredData);
+    if (Object.values(checkedItems).every(arr => arr.length === 0)) {
+      props.route.params.setFilteredData(null);
+    } else {
+      props.route.params.setFilteredData(filteredData);
+    }
+    props.route.params.setFilterValues(checkedItems);
     props.navigation.goBack();
   };
   return (
