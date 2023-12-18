@@ -13,6 +13,23 @@ export const ApiNetwork = {
       // password: params?.password,
     },
   }),
+  makeuserApiCall: params => ({
+    method: NETWORK_METHOD.POST,
+    url: ENDPOINTS.User,
+    data: {
+      registrationFor: '0',
+      organisationName: '',
+      organisationType: '',
+      firstName: params?.firstName,
+      lastName: params?.lastName,
+      email: params?.email,
+      contactNo: params?.contactNo,
+      address: params?.address,
+      state: params?.state,
+      district: params?.district,
+      password: params?.password,
+    },
+  }),
   makeStateApiCall: params => ({
     method: NETWORK_METHOD.GET,
     url: ENDPOINTS.State,
