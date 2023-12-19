@@ -36,6 +36,7 @@ import {getStateData} from '../Redux/Selector';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
 import {CommonActions} from '@react-navigation/native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const AddEvent = props => {
   const isUpdateTournament = props?.route?.params?.isUpdateTournament;
@@ -322,7 +323,7 @@ const AddEvent = props => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container}>
       <Text style={styles.titleStyle}>Enter Tournament Details</Text>
       <SportyInputText
         placeholder="Tournament Title"
@@ -477,7 +478,7 @@ const AddEvent = props => {
         onPress={onClickModalItem}
         onClose={() => setSportyModalVisible(false)}
       />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

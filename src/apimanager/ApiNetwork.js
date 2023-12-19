@@ -7,10 +7,10 @@ export const ApiNetwork = {
     method: NETWORK_METHOD.POST,
     url: ENDPOINTS.UserLogin,
     data: {
-      username: 'sportysuperuser@sporty.com',
-      password: 'Password1,',
-      // username: params?.username,
-      // password: params?.password,
+      // username: 'sportysuperuser@sporty.com',
+      // password: 'Password1,',
+      username: params?.email,
+      password: params?.password,
     },
   }),
   makeuserApiCall: params => ({
