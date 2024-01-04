@@ -9,4 +9,6 @@ export const ENDPOINTS = {
   GetTournaments: 'api/Tournament/GetTournaments',
   GetTournament: 'api/Tournament/GetTournament',
   UpdateTournament: 'api/Tournament/UpdateTournament',
+  RemoveTournament: 'api/Tournament/RemoveTournament',
+  ResetPassword: 'api/Account/ResetPassword',
 };

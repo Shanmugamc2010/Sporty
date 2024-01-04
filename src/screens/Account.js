@@ -31,7 +31,7 @@ const Account = props => {
     // Handle press based on the selected item
     switch (item) {
       case 'Change password':
-        // Handle Change password action
+        props.navigation.navigate(SCREEN_TYPE.RESET_PASSWORD.name);
         break;
       case 'Help':
         // Handle Help action
@@ -41,14 +41,13 @@ const Account = props => {
         break;
       case 'Logout':
         dispatch({type: LOGOUT_SUCCESS});
-        props.navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [{name: SCREEN_TYPE.LOG_IN.name}],
-          }),
-        );
         setTimeout(() => {
-          props.navigation.navigate(SCREEN_TYPE.LOG_IN.name);
+          props.navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [{name: SCREEN_TYPE.LOG_IN.name}],
+            }),
+          );
         }, 1000);
 
         break;

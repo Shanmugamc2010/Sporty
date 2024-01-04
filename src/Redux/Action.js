@@ -5,6 +5,7 @@ import {
   LOGIN_API_SUCCESS,
   SET_INITIAL_APP_OPEN,
   SET_STATE_DISTRICT_DATA,
+  STOP_LOADER,
 } from './Type';
 import {SCREEN_TYPE} from '../utils/themes/constant';
 import {apiCall} from '../apimanager/ApiManager';
@@ -18,9 +19,11 @@ export const loginApiSuccess = data => ({
   payload: data,
 });
 
-export const requestApiFailure = () => ({
-  type: REQUEST_API_DATA,
-});
+export const stopLoader = () => {
+  return {
+    type: STOP_LOADER,
+  };
+};
 
 export const setInitialAppOpen = () => {
   return {
@@ -52,7 +55,6 @@ export const makeLoginCall =
         );
       }
     } catch (error) {
-      dispatch(requestApiFailure());
       console.log(error);
     }
   };

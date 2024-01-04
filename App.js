@@ -14,6 +14,7 @@ import Color from './src/utils/themes/colors';
 import {Provider} from 'react-redux';
 import {Persistor, Store} from './src/Redux/Store';
 import {PersistGate} from 'redux-persist/integration/react';
+import SportyLoader from './src/components/SportyLoader';
 
 function App() {
   useEffect(() => {
@@ -25,6 +26,7 @@ function App() {
       <Provider store={Store}>
         <PersistGate loading={null} persistor={Persistor}>
           <RootStack />
+          <SportyLoader />
         </PersistGate>
       </Provider>
     </SafeAreaView>

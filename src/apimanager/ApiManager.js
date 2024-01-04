@@ -1,6 +1,8 @@
 import axios from 'axios';
 import {ENDPOINTS} from './Endpoint';
 import {Alert} from 'react-native';
+import {Store} from '../Redux/Store';
+import {requestApiAction, stopLoader} from '../Redux/Action';
 
 export const NETWORK_METHOD = {
   GET: 'GET',
@@ -24,13 +26,19 @@ API.interceptors.response.use(
 );
 
 export const apiCall = async params => {
-  const response = await API[params.method.toLowerCase()](
-    params.url,
-    params.data,
-  );
-  return response;
-  // const response = await axiosInstance.post(api);
-  // console.log(response);
+  Store.dispatch(requestApiAction()); // Start loader
+  try {
+    const response = await API[params.method.toLowerCase()](
+      params.url,
+      params.data,
+    );
+    return response;
+  } catch (error) {
+    console.error('API Call Error:', error);
+    throw error;
+  } finally {
+    Store.dispatch(stopLoader());
+  }
 };
 const requestHandler = request => {
   request.baseURL = ENDPOINTS.baseUrl;

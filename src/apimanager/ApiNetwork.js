@@ -7,10 +7,10 @@ export const ApiNetwork = {
     method: NETWORK_METHOD.POST,
     url: ENDPOINTS.UserLogin,
     data: {
-      // username: 'sportysuperuser@sporty.com',
-      // password: 'Password1,',
-      username: params?.email,
-      password: params?.password,
+      username: 'sportysuperuser@sporty.com',
+      password: 'Password1,',
+      //   username: params?.email,
+      //   password: params?.password,
     },
   }),
   makeuserApiCall: params => ({
@@ -53,12 +53,22 @@ export const ApiNetwork = {
   getTournamentsApiCall: params => ({
     method: NETWORK_METHOD.GET,
     url: `${ENDPOINTS.GetTournaments}?pageNo=1&rowsPerPage=1000&Status=1`,
-    // data: params,
   }),
 
   getTournamentApiCall: params => ({
     method: NETWORK_METHOD.GET,
     url: `${ENDPOINTS.GetTournament}?id=${params.tournamentId}`,
-    // data: params,
   }),
+  removeTournamentApiCall: params => ({
+    method: NETWORK_METHOD.DELETE,
+    url: `${ENDPOINTS.RemoveTournament}?id=${params.tournamentId}`,
+  }),
+  resetPasswordApiCall: params => {
+    console.log(params);
+    return {
+      method: NETWORK_METHOD.POST,
+      url: ENDPOINTS.RemoveTournament,
+      data: params,
+    };
+  },
 };

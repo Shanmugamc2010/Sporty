@@ -13,7 +13,8 @@ import {SCREEN_TYPE} from '../utils/themes/constant';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
 import {useRoute} from '@react-navigation/native';
-import {isAfterDate, isBeforeDate} from '../utils/helper';
+import {isAfterDate, isBeforeDate, isValidArray} from '../utils/helper';
+import {FONT_NAME} from '../utils/themes/FontName';
 
 const MyEvents = props => {
   const [tournamentData, setTournamentData] = useState([]);
@@ -69,13 +70,14 @@ const MyEvents = props => {
   const renderItem = ({item}) => {
     const isValidImage =
       item?.uploadedDocument1 !== '' && item?.uploadedDocument1 !== 'string';
+    console.log(item?.uploadedDocument1);
     return (
       <TouchableOpacity onPress={() => onClickItem(item)} style={styles.item}>
         <Image
           style={styles.imageStyle}
           source={
             isValidImage
-              ? {uri: `data:image/jpg;base64,${item?.uploadDocument1}`}
+              ? {uri: `data:image/jpg;base64,${item?.uploadedDocument1}`}
               : require('../assets/images/flatimage3.jpg')
           }
         />
@@ -89,12 +91,21 @@ const MyEvents = props => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={filteredData ? filteredData : tournamentData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index}
-        showsVerticalScrollIndicator={false}
-      />
+      {isValidArray(tournamentData) || isValidArray(filteredData) ? (
+        <FlatList
+          data={filteredData ? filteredData : tournamentData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.noEventsViewStyle}>
+          <Text style={styles.noEventsTextStyle}>
+            Add new Event to Show here!!!
+          </Text>
+        </View>
+      )}
+
       <View style={styles.footerStyle}>
         {route?.name === SCREEN_TYPE.ALL_EVENTS.name ? (
           <View style={styles.fullView}>
@@ -157,6 +168,12 @@ const styles = StyleSheet.create({
   },
   footerStyle: {
     flexDirection: 'row',
+  },
+  noEventsViewStyle: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  noEventsTextStyle: {
+    color: Color.borderColor,
+    fontSize: 18,
+    fontFamily: FONT_NAME.SEMI_BOLD,
   },
 });
 

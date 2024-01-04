@@ -58,6 +58,10 @@ export const SCREEN_TYPE = {
     name: 'All',
     title: 'All',
   },
+  RESET_PASSWORD: {
+    name: 'RESET PASSWORD',
+    title: 'RESET PASSWORD',
+  },
 };
 
 export const EVENT_TYPES = {

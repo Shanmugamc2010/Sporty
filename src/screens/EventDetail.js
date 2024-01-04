@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -15,13 +15,29 @@ import {SCREEN_TYPE} from '../utils/themes/constant';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
 import {isAfterOrEqualDate, isValidString} from '../utils/helper';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {CommonActions} from '@react-navigation/native';
+import SportyConfirmModal from '../components/SportyConfirmModal';
 const EventDetail = ({route, navigation}) => {
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [tournamentData, setTournamentData] = useState([]);
+  const [confirmModal, setConfirmModal] = useState(false);
   useEffect(() => {
     getTournamentData();
   }, []);
+  const getFlatListData = () => {
+    const data = [];
+    Object.entries(tournamentData).forEach(([key, value]) => {
+      if (
+        key.toLowerCase().includes('uploadeddocument') &&
+        isValidString(value)
+      ) {
+        data.push(value);
+      }
+    });
+    return data;
+  };
   const getTournamentData = async () => {
     const response = await apiCall(
       ApiNetwork.getTournamentApiCall({
@@ -34,18 +50,24 @@ const EventDetail = ({route, navigation}) => {
   const scrollToIndex = index => {
     flatListRef.current.scrollToIndex({animated: true, index});
   };
+  const memoizedFlatListData = useMemo(
+    () => getFlatListData(tournamentData),
+    [tournamentData],
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       scrollToIndex(currentIndex);
 
-      setCurrentIndex(prevIndex => (prevIndex + 1) % 3);
+      setCurrentIndex(
+        prevIndex => (prevIndex + 1) % memoizedFlatListData.length,
+      );
     }, 3000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [currentIndex]);
+  }, [currentIndex, memoizedFlatListData]);
   const lineSeperator = () => {
     return <View style={styles.seperatorStyle} />;
   };
@@ -62,7 +84,11 @@ const EventDetail = ({route, navigation}) => {
   const renderItem = ({item}) => {
     return (
       <View style={styles.imageContainer}>
-        <Image source={item.image} style={styles.imageStyle} />
+        {/* <Image source={item.image} style={styles.imageStyle} /> */}
+        <Image
+          source={{uri: `data:image/jpg;base64,${item}`}}
+          style={styles.imageStyle}
+        />
       </View>
     );
   };
@@ -72,21 +98,8 @@ const EventDetail = ({route, navigation}) => {
       <View style={styles.swipeContainer}>
         <FlatList
           ref={flatListRef}
-          data={[
-            {
-              id: '1',
-              image: null,
-            },
-            {
-              id: '2',
-              image: null,
-            },
-            {
-              id: '3',
-              image: null,
-            },
-          ]}
-          keyExtractor={item => item.id}
+          data={memoizedFlatListData}
+          keyExtractor={(item, index) => index}
           horizontal
           pagingEnabled={true}
           showsHorizontalScrollIndicator={false}
@@ -125,6 +138,32 @@ const EventDetail = ({route, navigation}) => {
       isUpdateTournament: true,
     });
   };
+  const onDeletePress = async () => {
+    try {
+      const response = await apiCall(
+        ApiNetwork.removeTournamentApiCall({
+          tournamentId: route.params.tournamentId,
+        }),
+      );
+
+      console.log(response);
+
+      if (response?.message === 'Successfully Deleted') {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name: SCREEN_TYPE.TAB_NAVIGATOR.name}],
+          }),
+        );
+      } else {
+        console.error('Unexpected response:', response);
+      }
+    } catch (error) {
+      console.error('Error during onDeletePress:', error);
+    } finally {
+      setConfirmModal(false);
+    }
+  };
 
   const isEventEditable = () => {
     let res = false;
@@ -142,19 +181,36 @@ const EventDetail = ({route, navigation}) => {
         <Text style={styles.headerTextStyle}>
           {tournamentData?.tournamentTitle}
         </Text>
-        {isEventEditable() ? (
+        {/* {isEventEditable() ? ( */}
+        <View style={styles.headerContainer}>
           <TouchableOpacity
-            style={styles.headerContainer}
-            onPress={onEditPress}>
+            onPress={onEditPress}
+            style={styles.editButtonContainerStyle}>
             <Text style={styles.editTextStyle}>Edit</Text>
           </TouchableOpacity>
-        ) : null}
+          <TouchableOpacity
+            style={styles.editButtonContainerStyle}
+            onPress={() => {
+              setConfirmModal(true);
+            }}>
+            <MaterialIcons name={'delete'} size={25} color={Color.Black} />
+          </TouchableOpacity>
+        </View>
+        {/* ) : null} */}
       </View>
       {lineSeperator()}
       <ScrollView style={styles.scrollViewStyle}>
         {Swiper()}
         <View style={styles.itemContainer}>{renderDetails()}</View>
       </ScrollView>
+      <SportyConfirmModal
+        visible={confirmModal}
+        title={'Do you want to Delete?'}
+        onPress={onDeletePress}
+        onClose={() => {
+          setConfirmModal(false);
+        }}
+      />
     </View>
   );
 };
@@ -173,6 +229,9 @@ const styles = StyleSheet.create({
     right: 10,
     top: 0,
     borderRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTextStyle: {
     color: Color.PinkishPurple,
@@ -238,6 +297,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     height: 150,
   },
+  editButtonContainerStyle: {marginHorizontal: 4},
 });
 
 export default EventDetail;

@@ -1,8 +1,7 @@
-import {isValidArray} from '../utils/helper';
 import {
   REQUEST_API_DATA,
   LOGIN_API_SUCCESS,
-  REQUEST_API_FAILURE,
+  STOP_LOADER,
   SET_INITIAL_APP_OPEN,
   SET_STATE_DISTRICT_DATA,
   LOGOUT_SUCCESS,
@@ -27,7 +26,7 @@ export const mainReducer = (state = initialState, action) => {
         ...state,
         loginData: action.payload,
       };
-    case REQUEST_API_FAILURE:
+    case STOP_LOADER:
       return {
         ...state,
         isLoading: false,

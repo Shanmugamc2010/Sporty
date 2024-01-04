@@ -13,6 +13,7 @@ import Dashboard from '../screens/Dashboard';
 import AddEvent from '../screens/AddEvent';
 import DashboardFilter from '../screens/DashboardFilter';
 import EventDetail from '../screens/EventDetail';
+import ResetPassword from '../screens/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 const hideHeader = {headerShown: false};
@@ -62,7 +63,12 @@ const MyStack = () => {
       <Stack.Screen
         name={SCREEN_TYPE.EVENT_DETAIL.name}
         component={EventDetail}
-        options={{headerTitle: SCREEN_TYPE.title}}
+        options={{headerTitle: SCREEN_TYPE.EVENT_DETAIL.title}}
+      />
+      <Stack.Screen
+        name={SCREEN_TYPE.RESET_PASSWORD.name}
+        component={ResetPassword}
+        options={{headerTitle: SCREEN_TYPE.RESET_PASSWORD.title}}
       />
       <Stack.Group
         screenOptions={{

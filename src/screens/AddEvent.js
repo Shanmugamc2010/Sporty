@@ -9,6 +9,8 @@ import {
   View,
   Image,
 } from 'react-native';
+import ImageResizer from 'react-native-image-resizer';
+
 import Color from '../utils/themes/colors';
 import {SportyInputText} from '../components/SprtyInput';
 import SportyButton from '../components/SportyButton';
@@ -20,6 +22,8 @@ import {
   SCREEN_TYPE,
   gender,
 } from '../utils/themes/constant';
+import RNFS from 'react-native-fs';
+
 import {
   isAfterOrEqualDate,
   isBeforeOrEqualDate,
@@ -31,14 +35,16 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import FileUploadModal from '../components/FileUploadModal';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SportyModal from '../components/SportyModal';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {getStateData} from '../Redux/Selector';
 import {apiCall} from '../apimanager/ApiManager';
 import {ApiNetwork} from '../apimanager/ApiNetwork';
 import {CommonActions} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {stopLoader} from '../Redux/Action';
 
 const AddEvent = props => {
+  const dispatch = useDispatch();
   const isUpdateTournament = props?.route?.params?.isUpdateTournament;
   const eventDetails = props?.route?.params?.eventDetails;
   const stateDataSelector = useSelector(state => getStateData(state));
@@ -109,14 +115,20 @@ const AddEvent = props => {
     const params = {
       tournamentTitle: title,
       venue,
-      gameType: parseInt(gameType.gameTypeId, 10),
+      gameType: parseInt(gameType?.gameTypeId, 10),
       gender: genderData,
       state: stateData,
       district: districtData,
-      startDate: eventStart.date.toISOString(),
-      endDate: eventEnd.date.toISOString(),
+      startDate: isValidString(eventStart?.date)
+        ? eventStart?.date?.toISOString()
+        : '',
+      endDate: isValidString(eventEnd?.date)
+        ? eventEnd?.date?.toISOString()
+        : '',
       registrationUrl: registerLink,
-      lastDateForRegistration: registrationEnd.date.toISOString(),
+      lastDateForRegistration: isValidString(registrationEnd?.date)
+        ? registrationEnd?.date?.toISOString()
+        : '',
       contactEmail: email,
       contactNumber1: contact1,
       contactNumber2: contact2,
@@ -126,7 +138,6 @@ const AddEvent = props => {
       // winnerPrizeAmount: 0,
       // runnerPrizeAmount: 0,
       // secondRunnerPrizeAmount: 0,
-      uploadedDocument1: '',
       conductedBy,
       ...uploadedDocuments,
     };
@@ -134,7 +145,6 @@ const AddEvent = props => {
       ? await apiCall(ApiNetwork.makeUpdateTournamentApiCall(params))
       : await apiCall(ApiNetwork.makeAddTournamentApiCall(params));
     if (response?.message === 'Successfully Created') {
-      console.log('called===>');
       props.navigation.dispatch(
         CommonActions.reset({
           index: 1,
@@ -170,7 +180,7 @@ const AddEvent = props => {
       setGenderData(data);
     } else if (activeField === EVENT_TYPES.STATE) {
       setStateData(data);
-      getDistrictData(data);
+      setTimeout(() => getDistrictData(data), 500);
     } else if (activeField === EVENT_TYPES.DISTRICT) {
       setDistrictData(data);
     } else if (activeField === EVENT_TYPES.GAMETYPE) {
@@ -183,12 +193,18 @@ const AddEvent = props => {
   };
 
   const getDistrictData = async data => {
-    if (stateData !== data) {
-      const response = await apiCall(
-        ApiNetwork.makeDistrictApiCall({state: data}),
-      );
-      setDistrictList(response?.data);
-      setDistrictData('');
+    try {
+      if (stateData !== data) {
+        const response = await apiCall(
+          ApiNetwork.makeDistrictApiCall({state: data}),
+        );
+        setDistrictList(response?.data);
+        setDistrictData('');
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      dispatch(stopLoader());
     }
   };
   const handleCameraPress = () => {
@@ -206,15 +222,30 @@ const AddEvent = props => {
   };
 
   const handleFilePress = () => {
-    launchImageLibrary({includeBase64: true}, async response => {
+    launchImageLibrary({includeBase64: true, quality: 0.1}, async response => {
       if (response.error) {
         Alert.alert('Error', 'Failed to open file picker');
       } else {
         if (!response?.didCancel) {
-          // setSelectedImages(prev => [
-          //   ...prev,
-          //   {uri: response.assets[0]?.uri, base64: response.assets[0]?.base64},
-          // ]);
+          const resizedImage = await ImageResizer.createResizedImage(
+            response.assets[0].uri,
+            300, // width
+            300, // height
+            'JPEG',
+            40, // quality (0 to 100)
+          );
+
+          try {
+            // Read the resized image file as base64 using react-native-fs
+            const base64 = await RNFS.readFile(resizedImage.path, 'base64');
+
+            setSelectedImages(prev => [
+              ...prev,
+              {uri: resizedImage.uri, base64: base64},
+            ]);
+          } catch (error) {
+            console.error('Error reading file as base64:', error);
+          }
         }
         setModalVisible(false);
       }
@@ -444,6 +475,9 @@ const AddEvent = props => {
         placeholder="Price Money"
         leftIcon={require('../assets/images/mail.png')}
         value={prizeMoney}
+        keyboardType={
+          Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'number'
+        }
         onChangeText={text => setPrizeMoney(text)}
       />
       <SportyInputText
